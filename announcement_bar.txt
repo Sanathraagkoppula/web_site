@@ -1,0 +1,44 @@
+<div class="ann-bar">
+  <div class="ann-track">
+    {%- comment -%} rendered twice for a seamless marquee loop {%- endcomment -%}
+    {%- for i in (1..2) -%}
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          <div class="ann-item" {{ block.shopify_attributes }}>{{ block.settings.text }}<span class="ann-dot"></span></div>
+        {%- endfor -%}
+      {%- else -%}
+        <div class="ann-item">Big Bling Sale — Starting From Flat <span>&#8377;999</span><span class="ann-dot"></span></div>
+        <div class="ann-item">&#10024; Free Shipping on Orders Above <span>&#8377;999</span><span class="ann-dot"></span></div>
+        <div class="ann-item"><span>8L+</span> Happy Customers &middot; Ships in 24 Hours<span class="ann-dot"></span></div>
+        <div class="ann-item">Easy <span>7-Day Returns</span> &middot; 100% Genuine Jewellery<span class="ann-dot"></span></div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Free Shipping on Orders Above ₹999</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar",
+      "blocks": [
+        { "type": "message", "settings": { "text": "<p>Big Bling Sale — Starting From Flat ₹999</p>" } },
+        { "type": "message", "settings": { "text": "<p>✨ Free Shipping on Orders Above ₹999</p>" } },
+        { "type": "message", "settings": { "text": "<p>8L+ Happy Customers · Ships in 24 Hours</p>" } },
+        { "type": "message", "settings": { "text": "<p>Easy 7-Day Returns · 100% Genuine Jewellery</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

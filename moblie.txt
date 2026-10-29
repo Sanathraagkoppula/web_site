@@ -1,0 +1,69 @@
+/* ============================================
+   OCCASIONS — mobile card carousel dots
+   ============================================ */
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-occ-track]').forEach(function (track) {
+    var dots = track.parentNode.querySelectorAll('.occ-dot');
+    if (!dots.length) return;
+    var raf;
+    track.addEventListener('scroll', function () {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () {
+        var cards = track.children, best = 0, bestD = Infinity, mid = track.scrollLeft + track.clientWidth / 2;
+        for (var i = 0; i < cards.length; i++) {
+          var c = cards[i], d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+          if (d < bestD) { bestD = d; best = i; }
+        }
+        dots.forEach(function (d, i) { d.classList.toggle('on', i === best); });
+      });
+    }, { passive: true });
+  });
+});
+
+
+
+
+
+
+
+
+
+
+  {%- comment -%} ===== Phones: swipeable cards (readable text, real tap targets) ===== {%- endcomment -%}
+  <div class="occ-mobile">
+    {%- if section.settings.intro_text != blank -%}
+      <p class="occ-mobile-intro">{{ section.settings.intro_text }}</p>
+    {%- endif -%}
+    <div class="occ-cards" data-occ-track>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign occ_link = block.settings.link
+          if occ_link == blank
+            assign occ_link = routes.search_url | append: '?type=product&q=' | append: block.settings.name | url_escape
+          endif
+        -%}
+        <a class="occ-card" href="{{ occ_link }}">
+          <div class="occ-thumb" style="{% if block.settings.image == blank %}background:{{ block.settings.bg_color }};{% endif %}">
+            {%- if block.settings.image != blank -%}
+              <img src="{{ block.settings.image | image_url: width: 600 }}" srcset="{{ block.settings.image | image_url: width: 400 }} 400w, {{ block.settings.image | image_url: width: 600 }} 600w" sizes="78vw" alt="{{ block.settings.name | escape }} jewellery" width="600" height="444" loading="lazy">
+            {%- else -%}<span aria-hidden="true">{{ block.settings.emoji }}</span>{%- endif -%}
+          </div>
+          <div class="occ-body">
+            <span class="occ-num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+            <h3 class="occ-name">{{ block.settings.name }}</h3>
+            <p class="occ-copy">{{ block.settings.copy }}</p>
+            <span class="occ-explore">Explore &rarr;</span>
+          </div>
+        </a>
+      {%- endfor -%}
+      <div class="occ-card occ-card--end">
+        <span class="ornament" aria-hidden="true">&#10022; &#10022; &#10022;</span>
+        <h3 class="occ-name">{{ section.settings.end_title | default: 'Your Story Awaits' }}</h3>
+        <p class="occ-copy">{{ section.settings.end_text }}</p>
+        <a class="btn btn-black" href="{{ end_link }}">{{ section.settings.end_button | default: 'Explore Full Store' }}</a>
+      </div>
+    </div>
+    <div class="occ-dots" aria-hidden="true">
+      {%- for block in section.blocks -%}<span class="occ-dot{% if forloop.first %} on{% endif %}"></span>{%- endfor -%}<span class="occ-dot"></span>
+    </div>
+  </div>

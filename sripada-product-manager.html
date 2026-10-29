@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sri Pada Product Manager</title>
+<style>
+:root{
+  --bg:#FAF8FB; --card:#fff; --line:#ECE5F2; --ink:#241A2E; --muted:#6B5F75;
+  --accent:#4F3267; --accent-d:#3E2752; --gold:#C9A44C; --gold-t:#7A5F22;
+  --ok:#2E7D4F; --warn:#B26A00; --bad:#B03A62; --r:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{font-size:1.05rem;margin:0 auto 0 0;letter-spacing:.04em}
+header h1 span{color:var(--gold-t);font-weight:500}
+.btn{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:8px;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-d);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#241A2E}
+.btn.danger{color:var(--bad);border-color:#f0d3dc}
+.btn.small{padding:5px 10px;font-size:.85rem}
+main{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.list-head{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.list-head input{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:4px 10px;font-size:.8rem}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.stats{font-size:.8rem;color:var(--muted)}
+#list{max-height:calc(100vh - 230px);overflow:auto}
+.item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:hover{background:#fbf8fd}
+.item.sel{background:#f3edf8;box-shadow:inset 3px 0 var(--accent)}
+.thumb{width:44px;height:44px;border-radius:8px;background:var(--line);flex:0 0 44px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.item .t{font-weight:600;font-size:.92rem}
+.item .s{font-size:.78rem;color:var(--muted)}
+.badge{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;letter-spacing:.03em}
+.b-new{background:#e5f4ea;color:var(--ok)}
+.b-edit{background:#fff1dc;color:var(--warn)}
+.b-del{background:#fbe3ea;color:var(--bad)}
+.b-draft{background:var(--line);color:var(--muted)}
+#editor{padding:18px 20px 90px}
+.empty{color:var(--muted);text-align:center;padding:80px 20px}
+h2{font-size:1.15rem;margin:0 0 4px}
+h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:24px 0 10px;border-top:1px solid var(--line);padding-top:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.f{display:flex;flex-direction:column;gap:5px}
+.f.full{grid-column:1/-1}
+.f label{font-size:.78rem;color:var(--muted);font-weight:600}
+.f input,.f select,.f textarea{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%}
+.f textarea{min-height:110px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:.85rem}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid #d9c9e8;border-color:var(--accent)}
+.hint{font-size:.75rem;color:var(--muted)}
+.err{color:var(--bad);font-size:.78rem}
+.taggrid{display:flex;flex-wrap:wrap;gap:6px}
+.tagbox{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:4px 10px;font-size:.82rem;cursor:pointer;user-select:none}
+.tagbox input{margin:0}
+.tagbox.on{border-color:var(--accent);background:#f3edf8}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:4px;border-bottom:1px solid var(--line)}
+td input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;min-width:60px}
+.tablewrap{overflow-x:auto}
+.imgrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.imgrow img{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--line)}
+.imgrow input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.savebar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;justify-content:flex-end;z-index:30;box-shadow:0 -6px 20px rgba(36,26,46,.06)}
+.savebar .msg{margin-right:auto;align-self:center;font-size:.85rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:76px;translate:-50% 0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:.88rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50;max-width:90vw}
+.toast.show{opacity:1}
+dialog{border:none;border-radius:14px;padding:0;max-width:560px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(36,26,46,.45)}
+.dlg{padding:20px}
+.dlg h2{margin-bottom:10px}
+.dlg p{color:var(--muted);line-height:1.55;margin:0 0 12px}
+.dlg .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.coinrow{display:flex;gap:10px;flex-wrap:wrap}
+.coinrow .f{flex:1;min-width:140px}
+.preview{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.82rem;max-height:220px;overflow:auto}
+@media (max-width: 900px){
+  main{grid-template-columns:minmax(0,1fr);padding:10px}
+  #list{max-height:none}
+  .grid,.grid.three{grid-template-columns:1fr}
+  header h1{width:100%}
+  #editorPanel{scroll-margin-top:120px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SRI PADA <span>· Product Manager</span></h1>
+  <button class="btn" id="btnImport" title="Load a product CSV (e.g. Shopify → Products → Export)">⬆ Import CSV</button>
+  <button class="btn" id="btnGold">🪙 Gold rate</button>
+  <button class="btn primary" id="btnNew">＋ New product</button>
+  <button class="btn gold" id="btnExport">⬇ Download CSV</button>
+  <input type="file" id="fileIn" accept=".csv,text/csv" hidden>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="list-head">
+      <input id="search" type="search" placeholder="Search name, SKU, tag…">
+      <div class="chips" id="filters"></div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <section class="panel" id="editorPanel">
+    <div id="editor"><div class="empty">Select a product on the left, or click <b>＋ New product</b>.</div></div>
+  </section>
+</main>
+
+<div class="savebar" id="savebar" hidden>
+  <span class="msg" id="savemsg">Unsaved changes</span>
+  <button class="btn" id="btnCancel">Cancel</button>
+  <button class="btn primary" id="btnSave">Save product</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Export dialog -->
+<dialog id="dlgExport"><div class="dlg">
+  <h2>Download CSV for Shopify</h2>
+  <p><b id="expCounts"></b></p>
+  <div class="actions" style="justify-content:flex-start">
+    <button class="btn gold" data-exp="changed">Only new &amp; edited products</button>
+    <button class="btn" data-exp="all">All products</button>
+  </div>
+  <p style="margin-top:14px">In Shopify: <b>Products → Import</b> → choose the file → tick <b>“Overwrite products with matching handles”</b> → Upload and preview → Import. Edited products replace their old values; new ones are added.</p>
+  <p class="hint">Deleted products can't be removed by CSV — delete them in Shopify admin. They're listed here after export so you know which ones.</p>
+  <label class="tagbox" style="display:inline-flex"><input type="checkbox" id="expMark" checked> After download, mark these products as up to date</label>
+  <div class="actions"><button class="btn" data-close>Close</button></div>
+</div></dialog>
+
+<!-- Gold rate dialog -->
+<dialog id="dlgGold"><div class="dlg">
+  <h2>Update gold coin prices</h2>
+  <p>Enter today's rate. Every product tagged <b>gold-coins</b> is re-priced from its weight option (e.g. “5 g”): <i>weight × rate × (1 + premium %)</i>, rounded to the nearest rupee.</p>
+  <div class="coinrow">
+    <div class="f"><label>24K rate (₹ per gram)</label><input type="number" id="r24" min="0" step="1"></div>
+    <div class="f"><label>22K rate (₹ per gram)</label><input type="number" id="r22" min="0" step="1"></div>
+    <div class="f"><label>Premium / making %</label><input type="number" id="rPrem" min="0" step="0.1" value="3"></div>
+  </div>
+  <div class="preview" id="goldPreview" style="margin-top:12px"></div>
+  <div class="actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="btnGoldApply">Apply prices</button></div>
+</div></dialog>
+
+<!-- Import dialog -->
+<dialog id="dlgImport"><div class="dlg">
+  <h2>Import CSV</h2>
+  <p id="impSummary"></p>
+  <div class="actions" style="justify-content:flex-start">
+    <button class="btn primary" data-imp="merge">Merge — update matching products, add new ones</button>
+    <button class="btn danger" data-imp="replace">Replace everything with this file</button>
+  </div>
+  <p class="hint" style="margin-top:12px">Tip: export from Shopify (Products → Export → All products → CSV for Excel/Numbers) and import it here so your real photos and products are included.</p>
+  <div class="actions"><button class="btn" data-close>Cancel</button></div>
+</div></dialog>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const SEED_CSV = "Title,URL handle,Description,Vendor,Product category,Type,Tags,Published on online store,Status,SKU,Barcodes,Option1 name,Option1 value,Option2 name,Option2 value,Price,Compare-at price,Cost per item,Charge tax,Inventory tracker,Inventory quantity,Continue selling when out of stock,Weight value (grams),Weight unit for display,Requires shipping,Fulfillment service,Product image URL,Image position,Image alt text,Variant image URL,Gift card,SEO title,SEO description,Collection\nDainty Flower Pendant Necklace,dainty-flower-pendant-necklace,\"<p>A tiny flower pendant on a fine chain \u2014 the easy everyday piece that goes with blazers and tees alike.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Chain: 16 + 2 inch extender<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, casual-wear, new\",TRUE,draft,SPJ-NCK-001,,,,,,1499,1999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Dainty Flower Pendant Necklace | Sri Pada Jewellers,A tiny flower pendant on a fine chain \u2014 the easy everyday piece that goes with blazers and tees alike.,\nMini Hoop Earrings,mini-hoop-earrings,\"<p>Light, polished mini hoops you'll forget you're wearing.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Diameter: 12 mm<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, casual-wear\",TRUE,draft,SPJ-EAR-001,,,,,,1199,1499,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Mini Hoop Earrings | Sri Pada Jewellers,\"Light, polished mini hoops you'll forget you're wearing.\",\nClassic Gold Band Ring,classic-gold-band-ring,\"<p>A smooth, stackable band for every day.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Width: 3 mm<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Rings,\"rings, casual-wear, gold-rings, minimalistic\",TRUE,draft,SPJ-RNG-001-6,,Ring Size,6,,,1499,1999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Classic Gold Band Ring | Sri Pada Jewellers,\"A smooth, stackable band for every day.\",\n,classic-gold-band-ring,,,,,,,,SPJ-RNG-001-7,,,7,,,1499,1999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,,,,\n,classic-gold-band-ring,,,,,,,,SPJ-RNG-001-8,,,8,,,1499,1999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,,,,\n,classic-gold-band-ring,,,,,,,,SPJ-RNG-001-9,,,9,,,1499,1999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,,,,\nPaperclip Chain Bracelet,paperclip-chain-bracelet,\"<p>A modern paperclip-link bracelet that layers with a watch.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Length: 6.5 + 1 inch adjustable<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bracelets,\"bracelets, casual-wear\",TRUE,draft,SPJ-BRC-001,,,,,,1299,,,TRUE,shopify,10,deny,4,g,TRUE,manual,,,,,FALSE,Paperclip Chain Bracelet | Sri Pada Jewellers,A modern paperclip-link bracelet that layers with a watch.,\nKundan Ruby Choker Necklace Set,kundan-ruby-choker-necklace-set,\"<p>A regal kundan choker with ruby-red drops and matching earrings \u2014 made for sarees, lehengas and festive days.<\/p><ul><li>Set: choker + pair of earrings<\/li><li>Finish: gold-plated brass with kundan and red stones<\/li><li>Adjustable dori closure<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Jewellery Sets,\"jewellery-sets, traditional, necklaces, earrings, festive, bridal\",TRUE,draft,SPJ-SET-001,,,,,,4999,6499,,TRUE,shopify,10,deny,65,g,TRUE,manual,,,,,FALSE,Kundan Ruby Choker Necklace Set | Sri Pada Jewellers,\"A regal kundan choker with ruby-red drops and matching earrings \u2014 made for sarees, lehengas and festive days.\",\nTemple Gold Jhumka Earrings,temple-gold-jhumka-earrings,\"<p>Classic bell-shaped jhumkas with fine temple detailing and pearl drops.<\/p><ul><li>Finish: gold-plated, antique polish<\/li><li>Length: 5 cm<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, traditional, festive\",TRUE,draft,SPJ-EAR-002,,,,,,1999,2499,,TRUE,shopify,10,deny,18,g,TRUE,manual,,,,,FALSE,Temple Gold Jhumka Earrings | Sri Pada Jewellers,Classic bell-shaped jhumkas with fine temple detailing and pearl drops.,\nKundan Bangle Set of 4,kundan-bangle-set-of-4,\"<p>Four gold-tone bangles with kundan accents to stack on each wrist.<\/p><ul><li>Set of 4<\/li><li>Finish: gold-plated brass with kundan<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bangles,\"bracelets, bangles, traditional, festive\",TRUE,draft,SPJ-BNG-001-2.4,,Bangle Size,2.4,,,2499,2999,,TRUE,shopify,10,deny,60,g,TRUE,manual,,,,,FALSE,Kundan Bangle Set of 4 | Sri Pada Jewellers,Four gold-tone bangles with kundan accents to stack on each wrist.,\n,kundan-bangle-set-of-4,,,,,,,,SPJ-BNG-001-2.6,,,2.6,,,2499,2999,,TRUE,shopify,10,deny,62,g,TRUE,manual,,,,,,,,\n,kundan-bangle-set-of-4,,,,,,,,SPJ-BNG-001-2.8,,,2.8,,,2499,2999,,TRUE,shopify,10,deny,64,g,TRUE,manual,,,,,,,,\nModern Mangalsutra,modern-mangalsutra,\"<p>A minimal everyday mangalsutra with black beads and a gold vermeil pendant.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Length: 18 inch<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Mangalsutra,\"mangalsutra, necklaces, traditional, daily-wear, bridal\",TRUE,draft,SPJ-MNG-001,,,,,,2399,,,TRUE,shopify,10,deny,6,g,TRUE,manual,,,,,FALSE,Modern Mangalsutra | Sri Pada Jewellers,A minimal everyday mangalsutra with black beads and a gold vermeil pendant.,\nPearl Strand Lab Diamond Necklace,pearl-strand-lab-diamond-necklace,\"<p>A double strand of lustrous pearls finished with a lab-grown diamond centrepiece \u2014 heirloom glamour for your biggest evenings.<\/p><ul><li>Freshwater pearls, 925 silver clasp<\/li><li>SGL-certified lab-grown diamond<\/li><li>Length: 17 inch<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, luxe-wear, lab-grown-diamond, bridal, pearl\",TRUE,draft,SPJ-NCK-002,,,,,,6999,8999,,TRUE,shopify,10,deny,28,g,TRUE,manual,,,,,FALSE,Pearl Strand Lab Diamond Necklace | Sri Pada Jewellers,A double strand of lustrous pearls finished with a lab-grown diamond centrepiece \u2014 heirloom glamour for your biggest evenings.,\nPearl Drop Chandbali Earrings,pearl-drop-chandbali-earrings,\"<p>Crescent chandbalis with cascading pearl drops that catch the light.<\/p><ul><li>Finish: gold-plated with pearls<\/li><li>Length: 6 cm<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, luxe-wear, pearl, festive\",TRUE,draft,SPJ-EAR-003,,,,,,2999,3799,,TRUE,shopify,10,deny,22,g,TRUE,manual,,,,,FALSE,Pearl Drop Chandbali Earrings | Sri Pada Jewellers,Crescent chandbalis with cascading pearl drops that catch the light.,\nPearl Bangle Stack,pearl-bangle-stack,\"<p>Slim pearl-studded bangles that stack beautifully with a saree.<\/p><ul><li>Set of 2<\/li><li>Freshwater pearls on gold-plated brass<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bangles,\"bracelets, bangles, luxe-wear, pearl\",TRUE,draft,SPJ-BNG-002-2.4,,Bangle Size,2.4,,,3499,,,TRUE,shopify,10,deny,40,g,TRUE,manual,,,,,FALSE,Pearl Bangle Stack | Sri Pada Jewellers,Slim pearl-studded bangles that stack beautifully with a saree.,\n,pearl-bangle-stack,,,,,,,,SPJ-BNG-002-2.6,,,2.6,,,3499,,,TRUE,shopify,10,deny,42,g,TRUE,manual,,,,,,,,\n,pearl-bangle-stack,,,,,,,,SPJ-BNG-002-2.8,,,2.8,,,3499,,,TRUE,shopify,10,deny,44,g,TRUE,manual,,,,,,,,\nGold Floral Cocktail Ring,gold-floral-cocktail-ring,\"<p>A statement floral ring set with lab-grown stones \u2014 made for parties and weddings.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Adjustable size<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Rings,\"rings, luxe-wear, gold-rings, party-wear, new\",TRUE,draft,SPJ-RNG-002,,,,,,2799,3499,,TRUE,shopify,10,deny,5,g,TRUE,manual,,,,,FALSE,Gold Floral Cocktail Ring | Sri Pada Jewellers,A statement floral ring set with lab-grown stones \u2014 made for parties and weddings.,\n24K Gold Coin 999.9 \u2013 Lakshmi,24k-gold-coin-999-9-lakshmi,\"<p>24 karat (999.9 purity) gold coin featuring Goddess Lakshmi, sealed in tamper-proof packaging with a purity certificate. Ideal for Dhanteras, Diwali, Akshaya Tritiya and gifting.<\/p><ul><li>Purity: 24K / 999.9<\/li><li>Hallmark: BIS (HUID on pack)<\/li><\/ul><p>Price follows the day's gold rate. 3% GST applies.<\/p>\",Sri Pada Jewellers,,Gold Coins,\"gold-coins, gold, 24k, investment, gifting, festive\",TRUE,draft,SPJ-GC-001-1G,,Weight,1 g,,,0,,,TRUE,shopify,5,deny,21,g,TRUE,manual,,,,,FALSE,24K Gold Coin 999.9 \u2013 Lakshmi | Sri Pada Jewellers,\"24 karat (999.9 purity) gold coin featuring Goddess Lakshmi, sealed in tamper-proof packaging with a purity certificate. Ideal for Dhanteras, Diwali,\",\n,24k-gold-coin-999-9-lakshmi,,,,,,,,SPJ-GC-001-2G,,,2 g,,,0,,,TRUE,shopify,5,deny,22,g,TRUE,manual,,,,,,,,\n,24k-gold-coin-999-9-lakshmi,,,,,,,,SPJ-GC-001-5G,,,5 g,,,0,,,TRUE,shopify,5,deny,25,g,TRUE,manual,,,,,,,,\n,24k-gold-coin-999-9-lakshmi,,,,,,,,SPJ-GC-001-10G,,,10 g,,,0,,,TRUE,shopify,5,deny,30,g,TRUE,manual,,,,,,,,\n22K Gold Coin 916 \u2013 Ganesha,22k-gold-coin-916-ganesha,\"<p>22 karat (916) gold coin featuring Lord Ganesha, sealed with a purity certificate.<\/p><ul><li>Purity: 22K / 916<\/li><li>Hallmark: BIS (HUID on pack)<\/li><\/ul><p>Price follows the day's gold rate. 3% GST applies.<\/p>\",Sri Pada Jewellers,,Gold Coins,\"gold-coins, gold, 22k, gifting, festive\",TRUE,draft,SPJ-GC-002-2G,,Weight,2 g,,,0,,,TRUE,shopify,5,deny,22,g,TRUE,manual,,,,,FALSE,22K Gold Coin 916 \u2013 Ganesha | Sri Pada Jewellers,\"22 karat (916) gold coin featuring Lord Ganesha, sealed with a purity certificate.\",\n,22k-gold-coin-916-ganesha,,,,,,,,SPJ-GC-002-4G,,,4 g,,,0,,,TRUE,shopify,5,deny,24,g,TRUE,manual,,,,,,,,\n,22k-gold-coin-916-ganesha,,,,,,,,SPJ-GC-002-8G,,,8 g,,,0,,,TRUE,shopify,5,deny,28,g,TRUE,manual,,,,,,,,\nSolitaire Lab Diamond Pendant,solitaire-lab-diamond-pendant,\"<p>One brilliant lab-grown diamond on a whisper-thin chain. Quiet luxury, every day.<\/p><ul><li>Metal: 925 sterling silver, 18K gold vermeil<\/li><li>Stone: SGL-certified lab-grown diamond<\/li><li>Chain: 16 + 2 inch<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, minimalistic, lab-grown-diamond, everyday\",TRUE,draft,SPJ-NCK-003,,,,,,3499,4299,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Solitaire Lab Diamond Pendant | Sri Pada Jewellers,\"One brilliant lab-grown diamond on a whisper-thin chain. Quiet luxury, every day.\",\nLab Diamond Stud Earrings,lab-diamond-stud-earrings,\"<p>Round lab-grown diamond studs in a four-prong setting.<\/p><ul><li>Metal: 925 sterling silver<\/li><li>Stone: SGL-certified lab-grown diamond<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, minimalistic, lab-grown-diamond\",TRUE,draft,SPJ-EAR-004,,,,,,2999,3599,,TRUE,shopify,10,deny,2,g,TRUE,manual,,,,,FALSE,Lab Diamond Stud Earrings | Sri Pada Jewellers,Round lab-grown diamond studs in a four-prong setting.,\nTwisted Gold Rope Ring,twisted-gold-rope-ring,\"<p>A delicate twisted-rope ring that stacks with everything.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Adjustable size<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Rings,\"rings, minimalistic, gold-rings, stackable\",TRUE,draft,SPJ-RNG-003,,,,,,1199,,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Twisted Gold Rope Ring | Sri Pada Jewellers,A delicate twisted-rope ring that stacks with everything.,\nFine Chain Anklet,fine-chain-anklet,\"<p>A barely-there chain anklet with a tiny bead charm.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Length: 9 + 1 inch<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Anklets,\"anklets, minimalistic\",TRUE,draft,SPJ-ANK-001,,,,,,999,1299,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Fine Chain Anklet | Sri Pada Jewellers,A barely-there chain anklet with a tiny bead charm.,\nTwinning Heart Pendant Set (Pair),twinning-heart-pendant-set-pair,\"<p>Two matching heart pendants \u2014 one for you, one for your bestie, sister or mom.<\/p><ul><li>Set of 2 necklaces<\/li><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Chain: 16 + 2 inch each<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, twinning, gifting, friendship\",TRUE,draft,SPJ-NCK-004,,,,,,2499,2999,,TRUE,shopify,10,deny,6,g,TRUE,manual,,,,,FALSE,Twinning Heart Pendant Set (Pair) | Sri Pada Jewellers,\"Two matching heart pendants \u2014 one for you, one for your bestie, sister or mom.\",\nTwinning Pearl Bracelet Pair,twinning-pearl-bracelet-pair,\"<p>A pair of dainty pearl bracelets, made to match.<\/p><ul><li>Set of 2<\/li><li>Freshwater pearls on 925 silver<\/li><li>Adjustable<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bracelets,\"bracelets, twinning, pearl, gifting, friendship\",TRUE,draft,SPJ-BRC-002,,,,,,1999,2499,,TRUE,shopify,10,deny,8,g,TRUE,manual,,,,,FALSE,Twinning Pearl Bracelet Pair | Sri Pada Jewellers,\"A pair of dainty pearl bracelets, made to match.\",\nTwinning Stud Earrings Duo,twinning-stud-earrings-duo,\"<p>Two pairs of matching sparkle studs to share.<\/p><ul><li>2 pairs<\/li><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, twinning, gifting, friendship, new\",TRUE,draft,SPJ-EAR-005,,,,,,1799,,,TRUE,shopify,10,deny,4,g,TRUE,manual,,,,,FALSE,Twinning Stud Earrings Duo | Sri Pada Jewellers,Two pairs of matching sparkle studs to share.,\nHis & Hers Heart Pendant Set,his-and-hers-heart-pendant-set,\"<p>A split-heart pendant pair for couples \u2014 a sleek chain for him, a dainty one for her.<\/p><ul><li>Set of 2 necklaces<\/li><li>Metal: 925 sterling silver (her: gold vermeil, him: rhodium)<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, better-half, couple, gifting, anniversary, mens\",TRUE,draft,SPJ-NCK-005,,,,,,2999,3999,,TRUE,shopify,10,deny,10,g,TRUE,manual,,,,,FALSE,His & Hers Heart Pendant Set | Sri Pada Jewellers,\"A split-heart pendant pair for couples \u2014 a sleek chain for him, a dainty one for her.\",\nCouple Promise Rings,couple-promise-rings,\"<p>Matching promise bands, sold as a pair. Choose her size at checkout and send his in the note, or exchange free after delivery.<\/p><ul><li>Set of 2 rings<\/li><li>Metal: 925 sterling silver<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Rings,\"rings, better-half, couple, anniversary, mens\",TRUE,draft,SPJ-RNG-004-6,,Her Ring Size,6,,,3499,4499,,TRUE,shopify,10,deny,8,g,TRUE,manual,,,,,FALSE,Couple Promise Rings | Sri Pada Jewellers,\"Matching promise bands, sold as a pair. Choose her size at checkout and send his in the note, or exchange free after delivery.\",\n,couple-promise-rings,,,,,,,,SPJ-RNG-004-7,,,7,,,3499,4499,,TRUE,shopify,10,deny,8,g,TRUE,manual,,,,,,,,\n,couple-promise-rings,,,,,,,,SPJ-RNG-004-8,,,8,,,3499,4499,,TRUE,shopify,10,deny,8,g,TRUE,manual,,,,,,,,\n,couple-promise-rings,,,,,,,,SPJ-RNG-004-9,,,9,,,3499,4499,,TRUE,shopify,10,deny,8,g,TRUE,manual,,,,,,,,\nInfinity Couple Bracelets,infinity-couple-bracelets,\"<p>Two infinity-link bracelets for the two of you.<\/p><ul><li>Set of 2<\/li><li>Metal: 925 sterling silver<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bracelets,\"bracelets, better-half, couple, gifting, mens\",TRUE,draft,SPJ-BRC-003,,,,,,2499,,,TRUE,shopify,10,deny,9,g,TRUE,manual,,,,,FALSE,Infinity Couple Bracelets | Sri Pada Jewellers,Two infinity-link bracelets for the two of you.,\nTeardrop Lab Diamond Necklace,teardrop-lab-diamond-necklace,\"<p>A single teardrop pendant that sits right at the collarbone \u2014 made for candlelight.<\/p><ul><li>Metal: 925 sterling silver, 18K gold vermeil<\/li><li>Stone: SGL-certified lab-grown diamond<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Necklaces,\"necklaces, date-night, lab-grown-diamond, party-wear, gifting\",TRUE,draft,SPJ-NCK-006,,,,,,3299,3999,,TRUE,shopify,10,deny,3,g,TRUE,manual,,,,,FALSE,Teardrop Lab Diamond Necklace | Sri Pada Jewellers,A single teardrop pendant that sits right at the collarbone \u2014 made for candlelight.,\nCrystal Drop Earrings,crystal-drop-earrings,\"<p>Long, swinging crystal drops for a little evening sparkle.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Length: 4 cm<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Earrings,\"earrings, date-night, party-wear\",TRUE,draft,SPJ-EAR-006,,,,,,1899,2399,,TRUE,shopify,10,deny,5,g,TRUE,manual,,,,,FALSE,Crystal Drop Earrings | Sri Pada Jewellers,\"Long, swinging crystal drops for a little evening sparkle.\",\nTennis Bracelet,tennis-bracelet,\"<p>A full line of sparkling lab-grown stones \u2014 the ultimate date-night wrist.<\/p><ul><li>Metal: 925 sterling silver<\/li><li>Length: 6.5 inch with safety clasp<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bracelets,\"bracelets, date-night, lab-grown-diamond, party-wear, new\",TRUE,draft,SPJ-BRC-004,,,,,,4499,5499,,TRUE,shopify,10,deny,9,g,TRUE,manual,,,,,FALSE,Tennis Bracelet | Sri Pada Jewellers,A full line of sparkling lab-grown stones \u2014 the ultimate date-night wrist.,\nHeart Charm Bracelet,heart-charm-bracelet,\"<p>Tiny hearts on an adjustable chain \u2014 a sweet gift for her.<\/p><ul><li>Metal: 18K gold vermeil on 925 sterling silver<\/li><li>Adjustable<\/li><\/ul><ul><li>Hypoallergenic, nickel-free<\/li><li>Anti-tarnish finish<\/li><li>Comes in a Sri Pada gift box<\/li><\/ul>\",Sri Pada Jewellers,,Bracelets,\"bracelets, date-night, gifting\",TRUE,draft,SPJ-BRC-005,,,,,,999,1499,,TRUE,shopify,10,deny,4,g,TRUE,manual,,,,,FALSE,Heart Charm Bracelet | Sri Pada Jewellers,Tiny hearts on an adjustable chain \u2014 a sweet gift for her.,\n";
+const STORE_KEY = 'spj_pm_v1';
+
+const STYLE_TAGS = ['casual-wear','traditional','luxe-wear','gold-coins','minimalistic','twinning','better-half','date-night'];
+const TYPE_TAGS  = ['rings','necklaces','earrings','bracelets','bangles','mangalsutra','anklets','jewellery-sets','gold-rings','gold'];
+const EXTRA_TAGS = ['new','bridal','festive','party-wear','daily-wear','gifting','lab-grown-diamond','pearl','couple','mens'];
+const TYPES = ['Rings','Necklaces','Earrings','Bracelets','Bangles','Mangalsutra','Anklets','Jewellery Sets','Gold Coins'];
+
+/* the column order Shopify's current product CSV uses */
+const COLS = ["Title","URL handle","Description","Vendor","Product category","Type","Tags","Published on online store","Status","SKU","Barcodes","Option1 name","Option1 value","Option2 name","Option2 value","Price","Compare-at price","Cost per item","Charge tax","Inventory tracker","Inventory quantity","Continue selling when out of stock","Weight value (grams)","Weight unit for display","Requires shipping","Fulfillment service","Product image URL","Image position","Image alt text","Variant image URL","Gift card","SEO title","SEO description","Collection"];
+
+/* old Shopify header names → current names (so a Shopify export imports fine) */
+const ALIAS = {
+  "Handle":"URL handle","Body (HTML)":"Description","Product Category":"Product category","Published":"Published on online store",
+  "Option1 Name":"Option1 name","Option1 Value":"Option1 value","Option2 Name":"Option2 name","Option2 Value":"Option2 value",
+  "Variant SKU":"SKU","Variant Barcode":"Barcodes","Barcode":"Barcodes","Variant Price":"Price","Variant Compare At Price":"Compare-at price",
+  "Cost per item":"Cost per item","Variant Taxable":"Charge tax","Variant Inventory Tracker":"Inventory tracker",
+  "Variant Inventory Qty":"Inventory quantity","Variant Inventory Policy":"Continue selling when out of stock",
+  "Variant Grams":"Weight value (grams)","Variant Weight Unit":"Weight unit for display","Variant Requires Shipping":"Requires shipping",
+  "Variant Fulfillment Service":"Fulfillment service","Image Src":"Product image URL","Image Position":"Image position",
+  "Image Alt Text":"Image alt text","Variant Image":"Variant image URL","Gift Card":"Gift card","SEO Title":"SEO title",
+  "SEO Description":"SEO description","Status":"Status","Title":"Title","Vendor":"Vendor","Type":"Type","Tags":"Tags","Collection":"Collection"
+};
+
+let state = { products: [], deleted: [] };   // product: {handle, f:{...}, variants:[...], images:[...], flag:'new'|'edited'|null, updated}
+let current = null;        // handle being edited ('' for a brand new product)
+let draft = null;          // working copy in the editor
+let dirty = false;
+let filter = 'all';
+
+/* ============================================================
+   CSV
+   ============================================================ */
+function parseCSV(text){
+  text = text.replace(/^﻿/, '');
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; }
+      else cell+=c;
+    } else {
+      if(c==='"') q=true;
+      else if(c===','){ row.push(cell); cell=''; }
+      else if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
+      else if(c==='\r'){ /* skip */ }
+      else cell+=c;
+    }
+  }
+  if(cell!=='' || row.length){ row.push(cell); rows.push(row); }
+  const head = rows.shift().map(h=>ALIAS[h.trim()]||h.trim());
+  return rows.filter(r=>r.some(v=>v!=='')).map(r=>{ const o={}; head.forEach((h,i)=>o[h]=r[i]??''); return o; });
+}
+function csvCell(v){ v = v==null ? '' : String(v); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+
+const PRODUCT_FIELDS = ["Title","Description","Vendor","Product category","Type","Tags","Published on online store","Status","Option1 name","Option2 name","Gift card","SEO title","SEO description","Collection"];
+const VARIANT_FIELDS = ["SKU","Barcodes","Option1 value","Option2 value","Price","Compare-at price","Cost per item","Charge tax","Inventory tracker","Inventory quantity","Continue selling when out of stock","Weight value (grams)","Weight unit for display","Requires shipping","Fulfillment service","Variant image URL"];
+
+function rowsToProducts(rows){
+  const map=new Map();
+  rows.forEach(r=>{
+    const h=(r["URL handle"]||'').trim(); if(!h) return;
+    let p=map.get(h);
+    if(!p){ p={handle:h,f:{},variants:[],images:[],flag:null,updated:null}; map.set(h,p); }
+    if(r["Title"]) PRODUCT_FIELDS.forEach(k=>{ if(r[k]!==undefined) p.f[k]=r[k]; });
+    const isVariant = r["Option1 value"] || r["SKU"] || r["Price"];
+    if(isVariant){ const v={}; VARIANT_FIELDS.forEach(k=>v[k]=r[k]||''); p.variants.push(v); }
+    if(r["Product image URL"]) p.images.push({url:r["Product image URL"], alt:r["Image alt text"]||''});
+  });
+  return [...map.values()].filter(p=>p.f["Title"]!==undefined);
+}
+
+function productsToCSV(list){
+  const out=[COLS.map(csvCell).join(',')];
+  list.forEach(p=>{
+    const n=Math.max(p.variants.length||1, p.images.length);
+    for(let i=0;i<n;i++){
+      const r={}; COLS.forEach(c=>r[c]='');
+      r["URL handle"]=p.handle;
+      if(i===0) PRODUCT_FIELDS.forEach(k=>r[k]=p.f[k]||'');
+      if(i===0 && !p.f["Option1 name"]) r["Option1 name"]='';
+      const v=p.variants[i];
+      if(v) VARIANT_FIELDS.forEach(k=>r[k]=v[k]||'');
+      const im=p.images[i];
+      if(im){ r["Product image URL"]=im.url; r["Image position"]=String(i+1); r["Image alt text"]=im.alt||''; }
+      out.push(COLS.map(c=>csvCell(r[c])).join(','));
+    }
+  });
+  return out.join('\r\n');
+}
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ toast('⚠ Could not save in this browser — download a CSV to keep your work.'); } }
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.products){ state=s; state.deleted=state.deleted||[]; return; } }catch(e){}
+  state={products:rowsToProducts(parseCSV(SEED_CSV)), deleted:[]};
+  save();
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug=s=>String(s||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const tagsOf=p=>(p.f["Tags"]||'').split(',').map(t=>t.trim()).filter(Boolean);
+const money=n=>n===''||n==null?'—':'₹'+Number(n).toLocaleString('en-IN');
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2800); }
+function download(name,text){ const b=new Blob([text],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); }
+const stamp=()=>{ const d=new Date(), z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`; };
+function nextSku(type){
+  const pre={Rings:'RNG',Necklaces:'NCK',Earrings:'EAR',Bracelets:'BRC',Bangles:'BNG',Mangalsutra:'MNG',Anklets:'ANK','Jewellery Sets':'SET','Gold Coins':'GC'}[type]||'PRD';
+  let max=0; state.products.forEach(p=>p.variants.forEach(v=>{ const m=(v.SKU||'').match(new RegExp('^SPJ-'+pre+'-(\\d+)')); if(m) max=Math.max(max,+m[1]); }));
+  return `SPJ-${pre}-${String(max+1).padStart(3,'0')}`;
+}
+function blankVariant(){ return {"SKU":"","Barcodes":"","Option1 value":"","Option2 value":"","Price":"","Compare-at price":"","Cost per item":"","Charge tax":"TRUE","Inventory tracker":"shopify","Inventory quantity":"10","Continue selling when out of stock":"deny","Weight value (grams)":"","Weight unit for display":"g","Requires shipping":"TRUE","Fulfillment service":"manual","Variant image URL":""}; }
+
+/* ============================================================
+   LIST
+   ============================================================ */
+function renderFilters(){
+  const opts=[['all','All'],['changed','New & edited'],...STYLE_TAGS.map(t=>[t,t.replace(/-/g,' ')])];
+  $('#filters').innerHTML=opts.map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${k}">${esc(l)}</button>`).join('');
+}
+function renderList(){
+  const q=$('#search').value.trim().toLowerCase();
+  let list=state.products.slice().sort((a,b)=>(a.f.Title||'').localeCompare(b.f.Title||''));
+  if(filter==='changed') list=list.filter(p=>p.flag);
+  else if(filter!=='all') list=list.filter(p=>tagsOf(p).includes(filter));
+  if(q) list=list.filter(p=>[p.f.Title,p.handle,p.f.Tags,p.f.Type,...p.variants.map(v=>v.SKU)].join(' ').toLowerCase().includes(q));
+  $('#list').innerHTML = list.length ? list.map(p=>{
+    const prices=p.variants.map(v=>+v.Price).filter(n=>!isNaN(n));
+    const pr=prices.length?(Math.min(...prices)===Math.max(...prices)?money(prices[0]):money(Math.min(...prices))+' – '+money(Math.max(...prices))):'—';
+    const stock=p.variants.reduce((s,v)=>s+(+v["Inventory quantity"]||0),0);
+    const img=p.images[0]?`<img class="thumb" src="${esc(p.images[0].url)}" alt="" loading="lazy">`:`<div class="thumb">💍</div>`;
+    const badge=p.flag==='new'?'<span class="badge b-new">NEW</span>':p.flag==='edited'?'<span class="badge b-edit">EDITED</span>':'';
+    const st=(p.f.Status||'').toLowerCase()==='draft'?'<span class="badge b-draft">DRAFT</span>':'';
+    return `<div class="item${current===p.handle?' sel':''}" data-h="${esc(p.handle)}">${img}<div style="min-width:0"><div class="t">${esc(p.f.Title)}${badge}${st}</div><div class="s">${esc(p.f.Type||'')} · ${pr} · ${stock} in stock · ${p.variants.length} variant${p.variants.length===1?'':'s'}</div></div></div>`;
+  }).join('') : '<div class="empty">No products match.</div>';
+  const ch=state.products.filter(p=>p.flag).length;
+  $('#stats').textContent=`${state.products.length} products · ${ch} new/edited waiting to export${state.deleted.length?` · ${state.deleted.length} deleted`:''}`;
+}
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+function openProduct(handle){
+  if(dirty && !confirm('Discard unsaved changes?')) return;
+  const p=state.products.find(x=>x.handle===handle);
+  current=handle; draft=JSON.parse(JSON.stringify(p)); dirty=false;
+  renderEditor(); renderList();
+  if(innerWidth<900) $('#editorPanel').scrollIntoView({behavior:'smooth'});
+}
+function newProduct(){
+  if(dirty && !confirm('Discard unsaved changes?')) return;
+  current=''; dirty=false;
+  draft={handle:'',f:{"Title":"","Description":"","Vendor":"Sri Pada Jewellers","Product category":"","Type":"Rings","Tags":"","Published on online store":"TRUE","Status":"draft","Option1 name":"","Option2 name":"","Gift card":"FALSE","SEO title":"","SEO description":"","Collection":""},variants:[blankVariant()],images:[],flag:'new'};
+  renderEditor(); renderList();
+  setTimeout(()=>$('#e_title')&&$('#e_title').focus(),50);
+  if(innerWidth<900) $('#editorPanel').scrollIntoView({behavior:'smooth'});
+}
+function field(id,label,val,opts={}){
+  const t=opts.type||'text';
+  if(t==='textarea') return `<div class="f ${opts.full?'full':''}"><label for="${id}">${label}</label><textarea id="${id}" data-k="${opts.k}">${esc(val)}</textarea>${opts.hint?`<span class="hint">${opts.hint}</span>`:''}</div>`;
+  if(t==='select') return `<div class="f ${opts.full?'full':''}"><label for="${id}">${label}</label><select id="${id}" data-k="${opts.k}">${opts.options.map(o=>{const [v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}"${String(v)===String(val)?' selected':''}>${esc(l)}</option>`}).join('')}</select>${opts.hint?`<span class="hint">${opts.hint}</span>`:''}</div>`;
+  return `<div class="f ${opts.full?'full':''}"><label for="${id}">${label}</label><input id="${id}" type="${t}" data-k="${opts.k}" value="${esc(val)}" ${opts.ph?`placeholder="${esc(opts.ph)}"`:''}>${opts.hint?`<span class="hint">${opts.hint}</span>`:''}</div>`;
+}
+function renderEditor(){
+  const p=draft, f=p.f, isNew=current==='';
+  const tags=new Set(tagsOf(p));
+  const known=new Set([...STYLE_TAGS,...TYPE_TAGS,...EXTRA_TAGS]);
+  const other=[...tags].filter(t=>!known.has(t)).join(', ');
+  const tagBoxes=(list)=>list.map(t=>`<label class="tagbox${tags.has(t)?' on':''}"><input type="checkbox" data-tag="${t}"${tags.has(t)?' checked':''}>${t}</label>`).join('');
+  const hasOpt=!!f["Option1 name"], hasOpt2=!!f["Option2 name"];
+  $('#editor').innerHTML=`
+    <h2>${isNew?'New product':esc(f.Title||'Untitled')}</h2>
+    <div class="hint">${isNew?'Fill in the details and click Save.':'Changes here <b>replace the old values</b> for this product when you save.'}</div>
+
+    <h3>Basics</h3>
+    <div class="grid">
+      ${field('e_title','Product name *',f.Title,{k:'Title',full:true})}
+      ${field('e_handle','URL handle',p.handle,{k:'__handle',hint:isNew?'Auto-filled from the name. Must be unique — this is how Shopify matches products when updating.':'Changing it creates a different product in Shopify — leave as is to update this one.'})}
+      ${field('e_type','Type',f.Type,{k:'Type',type:'select',options:[...new Set([...TYPES,f.Type].filter(Boolean))]})}
+      ${field('e_status','Status',(f.Status||'draft').toLowerCase(),{k:'Status',type:'select',options:[['active','Active (live)'],['draft','Draft (hidden)'],['archived','Archived']]})}
+      ${field('e_vendor','Brand / vendor',f.Vendor,{k:'Vendor'})}
+      ${field('e_desc','Description (HTML allowed)',f.Description,{k:'Description',type:'textarea',full:true,hint:'Use &lt;p&gt;…&lt;/p&gt; for paragraphs and &lt;ul&gt;&lt;li&gt;…&lt;/li&gt;&lt;/ul&gt; for bullet points.'})}
+    </div>
+
+    <h3>Collections &amp; tags</h3>
+    <div class="hint" style="margin-bottom:8px">Shop By Style (pick one or more)</div>
+    <div class="taggrid">${tagBoxes(STYLE_TAGS)}</div>
+    <div class="hint" style="margin:12px 0 8px">Category / homepage tabs</div>
+    <div class="taggrid">${tagBoxes(TYPE_TAGS)}</div>
+    <div class="hint" style="margin:12px 0 8px">Extra (“new” shows the New badge)</div>
+    <div class="taggrid">${tagBoxes(EXTRA_TAGS)}</div>
+    <div class="grid" style="margin-top:12px">${field('e_tagsx','Other tags (comma-separated)',other,{k:'__othertags',full:true})}</div>
+
+    <h3>Options &amp; variants</h3>
+    <div class="grid">
+      ${field('e_o1','Option name',f["Option1 name"],{k:'Option1 name',ph:'e.g. Ring Size, Weight, Finish',hint:'Leave empty if the product has no choices (one price only).'})}
+      ${field('e_o2','Second option (optional)',f["Option2 name"],{k:'Option2 name',ph:'e.g. Metal'})}
+    </div>
+    <div class="tablewrap" style="margin-top:10px"><table>
+      <thead><tr>${hasOpt?`<th>${esc(f["Option1 name"])}</th>`:''}${hasOpt2?`<th>${esc(f["Option2 name"])}</th>`:''}<th>SKU</th><th>Price ₹ *</th><th>Old price ₹</th><th>Cost ₹</th><th>Stock</th><th>Grams</th><th></th></tr></thead>
+      <tbody>${p.variants.map((v,i)=>`<tr>
+        ${hasOpt?`<td><input data-v="${i}" data-vk="Option1 value" value="${esc(v["Option1 value"])}"></td>`:''}
+        ${hasOpt2?`<td><input data-v="${i}" data-vk="Option2 value" value="${esc(v["Option2 value"])}"></td>`:''}
+        <td><input data-v="${i}" data-vk="SKU" value="${esc(v.SKU)}" style="min-width:130px"></td>
+        <td><input data-v="${i}" data-vk="Price" type="number" min="0" step="1" value="${esc(v.Price)}"></td>
+        <td><input data-v="${i}" data-vk="Compare-at price" type="number" min="0" step="1" value="${esc(v["Compare-at price"])}"></td>
+        <td><input data-v="${i}" data-vk="Cost per item" type="number" min="0" step="1" value="${esc(v["Cost per item"])}"></td>
+        <td><input data-v="${i}" data-vk="Inventory quantity" type="number" step="1" value="${esc(v["Inventory quantity"])}"></td>
+        <td><input data-v="${i}" data-vk="Weight value (grams)" type="number" min="0" step="0.1" value="${esc(v["Weight value (grams)"])}"></td>
+        <td>${p.variants.length>1?`<button class="btn small danger" data-delv="${i}" title="Remove">✕</button>`:''}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    ${hasOpt?`<button class="btn small" id="addVar" style="margin-top:8px">＋ Add ${esc(f["Option1 name"]).toLowerCase()}</button>`:'<div class="hint" style="margin-top:6px">Add an option name above to create sizes / weights / finishes.</div>'}
+    <div class="err" id="varErr"></div>
+
+    <h3>Photos</h3>
+    <div id="imgs">${p.images.map((im,i)=>`<div class="imgrow"><img src="${esc(im.url)}" alt="" onerror="this.style.visibility='hidden'"><input data-img="${i}" data-ik="url" value="${esc(im.url)}" placeholder="https://…"><input data-img="${i}" data-ik="alt" value="${esc(im.alt)}" placeholder="Alt text" style="max-width:200px"><button class="btn small danger" data-delimg="${i}">✕</button></div>`).join('')}</div>
+    <button class="btn small" id="addImg">＋ Add photo link</button>
+    <div class="hint" style="margin-top:6px">Paste public image links (must start with https://). Photos you uploaded in Shopify come in automatically when you import a Shopify export.</div>
+
+    <h3>Google / SEO</h3>
+    <div class="grid">
+      ${field('e_seot','SEO title',f["SEO title"],{k:'SEO title',full:true,hint:'About 60 characters. Leave empty to use the product name.'})}
+      ${field('e_seod','SEO description',f["SEO description"],{k:'SEO description',type:'textarea',full:true,hint:'About 150 characters — shown under the title on Google.'})}
+    </div>
+
+    ${isNew?'':`<h3>Danger zone</h3><button class="btn danger" id="btnDelete">Delete this product</button>`}
+  `;
+  $('#savebar').hidden=false; setDirty(dirty);
+}
+function setDirty(v){ dirty=v; $('#savemsg').textContent=v?'Unsaved changes':(current===''?'New product — not saved yet':'No changes'); $('#btnSave').disabled=!v && current!==''; }
+
+/* collect form values into draft */
+function readForm(){
+  const f=draft.f;
+  document.querySelectorAll('#editor [data-k]').forEach(el=>{
+    const k=el.dataset.k;
+    if(k==='__handle') draft.handle=slug(el.value);
+    else if(k==='__othertags'){}
+    else f[k]=el.value;
+  });
+  const tags=[...document.querySelectorAll('#editor [data-tag]:checked')].map(c=>c.dataset.tag);
+  const other=($('#e_tagsx')?.value||'').split(',').map(t=>t.trim()).filter(Boolean);
+  f.Tags=[...new Set([...tags,...other])].join(', ');
+  document.querySelectorAll('#editor [data-v]').forEach(el=>{ draft.variants[+el.dataset.v][el.dataset.vk]=el.value.trim(); });
+  document.querySelectorAll('#editor [data-img]').forEach(el=>{ draft.images[+el.dataset.img][el.dataset.ik]=el.value.trim(); });
+}
+
+function validate(){
+  const f=draft.f, errs=[];
+  if(!f.Title.trim()) errs.push('Product name is required.');
+  if(!draft.handle) draft.handle=slug(f.Title);
+  if(!draft.handle) errs.push('URL handle is required.');
+  const clash=state.products.find(p=>p.handle===draft.handle && p.handle!==current);
+  if(clash) errs.push(`URL handle “${draft.handle}” is already used by “${clash.f.Title}”.`);
+  const hasOpt=!!f["Option1 name"];
+  if(!hasOpt && draft.variants.length>1) errs.push('More than one variant needs an Option name (e.g. Ring Size).');
+  const seen=new Set(), skus=new Set();
+  state.products.forEach(p=>{ if(p.handle!==current) p.variants.forEach(v=>v.SKU&&skus.add(v.SKU)); });
+  draft.variants.forEach((v,i)=>{
+    const n=i+1;
+    if(v.Price===''||isNaN(+v.Price)) errs.push(`Variant ${n}: price is required.`);
+    if(v["Compare-at price"]!=='' && +v["Compare-at price"]<=+v.Price) errs.push(`Variant ${n}: old price must be higher than the price (or leave it empty).`);
+    if(hasOpt){
+      if(!v["Option1 value"]) errs.push(`Variant ${n}: ${f["Option1 name"]} value is required.`);
+      const key=v["Option1 value"]+'|'+v["Option2 value"];
+      if(seen.has(key)) errs.push(`Variant ${n}: “${v["Option1 value"]}” is listed twice.`);
+      seen.add(key);
+    } else { v["Option1 value"]=''; }
+    if(v.SKU){ if(skus.has(v.SKU)) errs.push(`Variant ${n}: SKU ${v.SKU} is already used.`); skus.add(v.SKU); }
+    if(v["Inventory quantity"]!=='' && !/^-?\d+$/.test(v["Inventory quantity"])) errs.push(`Variant ${n}: stock must be a whole number.`);
+  });
+  draft.images=draft.images.filter(im=>im.url);
+  draft.images.forEach((im,i)=>{ if(!/^https?:\/\//.test(im.url)) errs.push(`Photo ${i+1}: link must start with https://`); });
+  return errs;
+}
+
+function saveProduct(){
+  readForm();
+  const errs=validate();
+  if(errs.length){ $('#varErr').innerHTML=errs.map(esc).join('<br>'); $('#varErr').scrollIntoView({behavior:'smooth',block:'center'}); toast('Please fix: '+errs[0]); return; }
+  const f=draft.f;
+  if(!f["SEO title"]) f["SEO title"]=(f.Title+' | Sri Pada Jewellers').slice(0,70);
+  if(!f["SEO description"]) f["SEO description"]=(f.Description||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,155);
+  /* auto SKUs for empty ones */
+  let base=null;
+  draft.variants.forEach(v=>{ if(!v.SKU){ base=base||nextSku(f.Type); v.SKU = draft.variants.length>1 && v["Option1 value"] ? `${base}-${v["Option1 value"].replace(/\s+/g,'').toUpperCase()}` : base; } });
+  draft.updated=new Date().toISOString();
+  if(current===''){
+    draft.flag='new';
+    state.products.push(draft);
+    toast('✅ Added “'+f.Title+'”');
+  } else {
+    const i=state.products.findIndex(p=>p.handle===current);
+    const old=state.products[i];
+    draft.flag = old.flag==='new' ? 'new' : 'edited';
+    state.products[i]=draft;              // ← old values are replaced
+    toast('✅ Updated “'+f.Title+'” — old values replaced');
+  }
+  current=draft.handle; draft=JSON.parse(JSON.stringify(draft)); dirty=false;
+  save(); renderEditor(); renderList();
+}
+
+function deleteProduct(){
+  const p=state.products.find(x=>x.handle===current);
+  if(!confirm(`Delete “${p.f.Title}”?\n\nIt will be removed from this list. Remember to also delete it in Shopify admin.`)) return;
+  state.products=state.products.filter(x=>x.handle!==current);
+  if(p.flag!=='new') state.deleted.push({handle:p.handle,title:p.f.Title});
+  current=null; draft=null; dirty=false; save();
+  $('#editor').innerHTML='<div class="empty">Product deleted.</div>'; $('#savebar').hidden=true; renderList();
+}
+
+/* ============================================================
+   EXPORT / IMPORT
+   ============================================================ */
+function openExport(){
+  if(dirty && !confirm('You have unsaved changes in the editor. Export without them?')) return;
+  const n=state.products.filter(p=>p.flag==='new').length, e=state.products.filter(p=>p.flag==='edited').length;
+  $('#expCounts').textContent=`${n} new · ${e} edited · ${state.products.length} total`;
+  $('#dlgExport').showModal();
+}
+function doExport(kind){
+  const list = kind==='changed' ? state.products.filter(p=>p.flag) : state.products;
+  if(!list.length){ toast('Nothing new or edited to export.'); return; }
+  download(`sripada-products-${kind==='changed'?'updates':'all'}-${stamp()}.csv`, productsToCSV(list));
+  let msg=`⬇ Downloaded ${list.length} product${list.length===1?'':'s'}`;
+  if($('#expMark').checked){ list.forEach(p=>p.flag=null); }
+  if(state.deleted.length){ alert('Also delete these in Shopify admin (CSV import cannot delete):\n\n• '+state.deleted.map(d=>d.title).join('\n• ')); if($('#expMark').checked) state.deleted=[]; }
+  save(); renderList(); $('#dlgExport').close(); toast(msg);
+}
+
+let pendingImport=null;
+function handleFile(file){
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const rows=parseCSV(rd.result);
+      if(!rows.length || !('URL handle' in rows[0])) throw new Error('This file has no Handle / URL handle column — is it a product CSV?');
+      const prods=rowsToProducts(rows);
+      if(!prods.length) throw new Error('No products found in this file.');
+      pendingImport=prods;
+      const existing=prods.filter(p=>state.products.some(x=>x.handle===p.handle)).length;
+      $('#impSummary').innerHTML=`Found <b>${prods.length}</b> products — <b>${existing}</b> already in your list (will be updated) and <b>${prods.length-existing}</b> new.`;
+      $('#dlgImport').showModal();
+    }catch(e){ alert('Could not read the CSV: '+e.message); }
+  };
+  rd.readAsText(file,'utf-8');
+}
+function doImport(mode){
+  if(!pendingImport) return;
+  if(mode==='replace'){
+    if(!confirm('Replace ALL products in this tool with the imported file?')) return;
+    state.products=pendingImport.map(p=>({...p,flag:null})); state.deleted=[];
+  } else {
+    pendingImport.forEach(p=>{
+      const i=state.products.findIndex(x=>x.handle===p.handle);
+      if(i>-1) state.products[i]={...p,flag:null};    // imported file wins → old values replaced
+      else state.products.push({...p,flag:null});
+    });
+  }
+  pendingImport=null; current=null; draft=null; dirty=false; save();
+  $('#editor').innerHTML='<div class="empty">Import complete. Select a product to edit.</div>'; $('#savebar').hidden=true;
+  renderList(); $('#dlgImport').close(); toast('✅ Import complete');
+}
+
+/* ============================================================
+   GOLD RATE
+   ============================================================ */
+function coinProducts(){ return state.products.filter(p=>tagsOf(p).includes('gold-coins')); }
+function karatOf(p){ const t=(p.f.Title+' '+p.f.Tags).toLowerCase(); return /22\s*k/.test(t)?22:24; }
+function gramsOf(v){ const m=(v["Option1 value"]||'').match(/([\d.]+)\s*g/i); return m?+m[1]:null; }
+function goldCalc(){
+  const r24=+$('#r24').value||0, r22=+$('#r22').value||0, prem=+$('#rPrem').value||0;
+  return coinProducts().map(p=>({p, rows:p.variants.map(v=>{ const g=gramsOf(v), rate=karatOf(p)===22?r22:r24; return {v,g,price:(g&&rate)?Math.round(g*rate*(1+prem/100)):null}; })}));
+}
+function renderGold(){
+  const calc=goldCalc();
+  $('#goldPreview').innerHTML = calc.length ? calc.map(({p,rows})=>`<b>${esc(p.f.Title)}</b><br>`+rows.map(r=>`${esc(r.v["Option1 value"]||'—')}: ${money(r.v.Price)} → <b>${r.price==null?'(no rate)':money(r.price)}</b>`).join(' · ')).join('<br><br>') : 'No products tagged gold-coins.';
+}
+function applyGold(){
+  const calc=goldCalc(); let n=0;
+  calc.forEach(({p,rows})=>{ let ch=false; rows.forEach(r=>{ if(r.price!=null && String(r.price)!==String(r.v.Price)){ r.v.Price=String(r.price); ch=true; n++; } }); if(ch){ p.flag=p.flag==='new'?'new':'edited'; p.updated=new Date().toISOString(); } });
+  try{ localStorage.setItem('spj_pm_rates',JSON.stringify({r24:$('#r24').value,r22:$('#r22').value,prem:$('#rPrem').value})); }catch(e){}
+  save(); renderList(); if(current!==null && current!=='' ) openProduct(current);
+  $('#dlgGold').close(); toast(n?`🪙 Updated ${n} coin price${n===1?'':'s'} — download the CSV to send them to Shopify`:'No prices changed');
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+$('#btnNew').onclick=newProduct;
+$('#btnExport').onclick=openExport;
+$('#btnImport').onclick=()=>$('#fileIn').click();
+$('#fileIn').onchange=e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); e.target.value=''; };
+$('#btnGold').onclick=()=>{ try{ const r=JSON.parse(localStorage.getItem('spj_pm_rates')||'{}'); if(r.r24) $('#r24').value=r.r24; if(r.r22) $('#r22').value=r.r22; if(r.prem) $('#rPrem').value=r.prem; }catch(e){} renderGold(); $('#dlgGold').showModal(); };
+['#r24','#r22','#rPrem'].forEach(s=>$(s).addEventListener('input',renderGold));
+$('#btnGoldApply').onclick=applyGold;
+$('#btnSave').onclick=saveProduct;
+$('#btnCancel').onclick=()=>{ if(dirty && !confirm('Discard unsaved changes?')) return; dirty=false; if(current) openProduct(current); else { current=null; $('#editor').innerHTML='<div class="empty">Select a product on the left, or click <b>＋ New product</b>.</div>'; $('#savebar').hidden=true; renderList(); } };
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
+document.querySelectorAll('[data-imp]').forEach(b=>b.onclick=()=>doImport(b.dataset.imp));
+$('#search').addEventListener('input',renderList);
+$('#filters').addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return; filter=b.dataset.f; renderFilters(); renderList(); });
+$('#list').addEventListener('click',e=>{ const it=e.target.closest('[data-h]'); if(it) openProduct(it.dataset.h); });
+
+const ed=$('#editor');
+ed.addEventListener('input',e=>{
+  if(!draft) return;
+  setDirty(true);
+  if(e.target.id==='e_title' && current===''){ const h=$('#e_handle'); if(h && !h.dataset.touched) h.value=slug(e.target.value); }
+  if(e.target.id==='e_handle') e.target.dataset.touched='1';
+  if(e.target.matches('[data-tag]')) e.target.closest('.tagbox').classList.toggle('on',e.target.checked);
+  if(e.target.matches('[data-ik="url"]')){ const img=e.target.parentNode.querySelector('img'); img.style.visibility='visible'; img.src=e.target.value; }
+});
+ed.addEventListener('change',e=>{
+  if(!draft) return;
+  if(['e_o1','e_o2','e_type'].includes(e.target.id)){ readForm(); renderEditor(); setDirty(true); }
+});
+ed.addEventListener('click',e=>{
+  if(!draft) return;
+  const t=e.target;
+  if(t.id==='addVar'){ readForm(); const last=draft.variants[draft.variants.length-1]; const v={...blankVariant(),Price:last.Price,"Compare-at price":last["Compare-at price"],"Cost per item":last["Cost per item"],"Weight value (grams)":last["Weight value (grams)"]}; draft.variants.push(v); renderEditor(); setDirty(true); }
+  else if(t.dataset.delv!==undefined){ readForm(); draft.variants.splice(+t.dataset.delv,1); renderEditor(); setDirty(true); }
+  else if(t.id==='addImg'){ readForm(); draft.images.push({url:'',alt:''}); renderEditor(); setDirty(true); }
+  else if(t.dataset.delimg!==undefined){ readForm(); draft.images.splice(+t.dataset.delimg,1); renderEditor(); setDirty(true); }
+  else if(t.id==='btnDelete'){ deleteProduct(); }
+});
+window.addEventListener('beforeunload',e=>{ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey) && e.key==='s' && draft){ e.preventDefault(); saveProduct(); } });
+
+/* ============================================================
+   START
+   ============================================================ */
+load(); renderFilters(); renderList();
+</script>
+</body>
+</html>
