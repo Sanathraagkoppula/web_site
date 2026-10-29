@@ -39,6 +39,10 @@ main{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:16
 .thumb{width:44px;height:44px;border-radius:8px;background:var(--line);flex:0 0 44px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
 .item .t{font-weight:600;font-size:.92rem}
 .item .s{font-size:.78rem;color:var(--muted)}
+.item-del{margin-left:auto;flex:0 0 auto;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1rem;opacity:0;transition:opacity .15s}
+.item:hover .item-del,.item.sel .item-del,.item-del:focus-visible{opacity:1}
+.item-del:hover{color:var(--bad);border-color:#f0d3dc;background:#fdf3f6}
+@media (hover:none){.item-del{opacity:1}}
 .badge{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;letter-spacing:.03em}
 .b-new{background:#e5f4ea;color:var(--ok)}
 .b-edit{background:#fff1dc;color:var(--warn)}
@@ -71,6 +75,7 @@ td input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6
 .imgrow img{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--line)}
 .imgrow input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;min-width:0}
 .savebar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;justify-content:flex-end;z-index:30;box-shadow:0 -6px 20px rgba(36,26,46,.06)}
+.savebar[hidden]{display:none}
 .savebar .msg{margin-right:auto;align-self:center;font-size:.85rem;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:76px;translate:-50% 0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:.88rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50;max-width:90vw}
 .toast.show{opacity:1}
@@ -308,7 +313,7 @@ function renderList(){
     const img=p.images[0]?`<img class="thumb" src="${esc(p.images[0].url)}" alt="" loading="lazy">`:`<div class="thumb">💍</div>`;
     const badge=p.flag==='new'?'<span class="badge b-new">NEW</span>':p.flag==='edited'?'<span class="badge b-edit">EDITED</span>':'';
     const st=(p.f.Status||'').toLowerCase()==='draft'?'<span class="badge b-draft">DRAFT</span>':'';
-    return `<div class="item${current===p.handle?' sel':''}" data-h="${esc(p.handle)}">${img}<div style="min-width:0"><div class="t">${esc(p.f.Title)}${badge}${st}</div><div class="s">${esc(p.f.Type||'')} · ${pr} · ${stock} in stock · ${p.variants.length} variant${p.variants.length===1?'':'s'}</div></div></div>`;
+    return `<div class="item${current===p.handle?' sel':''}" data-h="${esc(p.handle)}">${img}<div style="min-width:0"><div class="t">${esc(p.f.Title)}${badge}${st}</div><div class="s">${esc(p.f.Type||'')} · ${pr} · ${stock} in stock · ${p.variants.length} variant${p.variants.length===1?'':'s'}</div></div><button class="item-del" data-del="${esc(p.handle)}" title="Remove from list" aria-label="Remove ${esc(p.f.Title)}">🗑</button></div>`;
   }).join('') : '<div class="empty">No products match.</div>';
   const ch=state.products.filter(p=>p.flag).length;
   $('#stats').textContent=`${state.products.length} products · ${ch} new/edited waiting to export${state.deleted.length?` · ${state.deleted.length} deleted`:''}`;
@@ -478,13 +483,17 @@ function saveProduct(){
   save(); renderEditor(); renderList();
 }
 
-function deleteProduct(){
-  const p=state.products.find(x=>x.handle===current);
-  if(!confirm(`Delete “${p.f.Title}”?\n\nIt will be removed from this list. Remember to also delete it in Shopify admin.`)) return;
-  state.products=state.products.filter(x=>x.handle!==current);
+function deleteProduct(handle=current){
+  const p=state.products.find(x=>x.handle===handle);
+  if(!p) return;
+  if(!confirm(`Remove “${p.f.Title}”?\n\nIt will be removed from this list. Remember to also delete it in Shopify admin.`)) return;
+  state.products=state.products.filter(x=>x.handle!==handle);
   if(p.flag!=='new') state.deleted.push({handle:p.handle,title:p.f.Title});
-  current=null; draft=null; dirty=false; save();
-  $('#editor').innerHTML='<div class="empty">Product deleted.</div>'; $('#savebar').hidden=true; renderList();
+  if(handle===current){
+    current=null; draft=null; dirty=false;
+    $('#editor').innerHTML='<div class="empty">Product removed.</div>'; $('#savebar').hidden=true;
+  }
+  save(); renderList(); toast('🗑 Removed “'+p.f.Title+'”');
 }
 
 /* ============================================================
@@ -579,7 +588,7 @@ document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>doExport(b.data
 document.querySelectorAll('[data-imp]').forEach(b=>b.onclick=()=>doImport(b.dataset.imp));
 $('#search').addEventListener('input',renderList);
 $('#filters').addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return; filter=b.dataset.f; renderFilters(); renderList(); });
-$('#list').addEventListener('click',e=>{ const it=e.target.closest('[data-h]'); if(it) openProduct(it.dataset.h); });
+$('#list').addEventListener('click',e=>{ const d=e.target.closest('[data-del]'); if(d){ e.stopPropagation(); deleteProduct(d.dataset.del); return; } const it=e.target.closest('[data-h]'); if(it) openProduct(it.dataset.h); });
 
 const ed=$('#editor');
 ed.addEventListener('input',e=>{
